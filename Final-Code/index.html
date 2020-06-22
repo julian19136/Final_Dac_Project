@@ -1,0 +1,553 @@
+<!DOCTYPE html>
+<html>
+    
+<head>
+
+  <script src="js/three.js"></script>
+  <script src="https://js.leapmotion.com/leap-0.6.4.js"></script>
+  <script src="js/leap-plugins-0.1.11pre.js"></script>
+
+  <script src="build/leap-widgets-0.1.0.js"></script>
+  <script type="text/javascript" src="build/leap.rigged-hand-0.1.7.js"></script>
+
+  <script src="js/OrbitControls.js"></script>
+
+  <script src="loaders/opentype.min.js"></script>
+  <script src="loaders/TTFLoader.js"></script>
+
+  <style>
+    body {
+      margin: 0;
+    }
+      
+    canvas.leap-boneHAnd{
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+    }
+
+    #view-source {
+      position: absolute;
+      top: 0;
+      right: 0;
+      margin: 10px;
+      z-index: 0;
+    }
+      
+  </style>
+
+</head>
+    
+<body>
+    
+</body>
+    
+
+<script>
+    
+
+
+  // Set up plugins
+
+  Leap.loop({background: true})
+    .use('transform', {
+      vr: 'desktop' // Switch to meters.
+    })
+    .use('boneHand', {
+      targetEl: document.body,
+      jointColor: new THREE.Color(0xffffff),
+      rendererOps: {antialias: true}
+    })
+    .use('proximity');
+
+    
+  // Set up scene
+    
+  var scene = Leap.loopController.plugins.boneHand.scene;
+  var camera = Leap.loopController.plugins.boneHand.camera;
+  var renderer = Leap.loopController.plugins.boneHand.renderer;
+    
+    
+  ///////////////////////////
+  ///////////////////////////
+  ///////////////////////////   
+    
+    
+  //scene.background = new THREE.Color( 0x222222 );
+
+    
+  var planeGeo = new THREE.PlaneGeometry(0.1, 0.1);
+    
+    
+  var longThrow = 
+      [
+        -0.02,
+        -0.02,
+        -0.02,
+        -0.02,
+        -0.02,
+        -0.02,
+        -0.02
+      ];
+    
+  
+  var cubeMaterials =
+      [
+        new THREE.MeshStandardMaterial( { 
+            color: 0x222222, 
+            side: THREE.DoubleSide,
+            transparent: true,
+            opacity: 1,
+            metalness: 0.0,
+            roughness: 0.5} ),
+        new THREE.MeshBasicMaterial( { 
+            map: new THREE.TextureLoader().load( 
+            'textures/ABOUT.jpg' ), 
+            side: THREE.DoubleSide,
+            transparent: true,
+            opacity: 1} ),
+        new THREE.MeshBasicMaterial( { 
+            map: new THREE.TextureLoader().load( 
+            'textures/CODE.jpg' ), 
+            side: THREE.DoubleSide,
+            transparent: true,
+            opacity: 1} ),
+        new THREE.MeshBasicMaterial( { 
+            map: new THREE.TextureLoader().load( 
+            'textures/POINT.jpg' ), 
+            side: THREE.DoubleSide,
+            transparent: true,
+            opacity: 1} ),
+        new THREE.MeshBasicMaterial( { 
+            map: new THREE.TextureLoader().load( 'textures/ARTWORK.jpg' ), 
+            side: THREE.DoubleSide,
+            transparent: true,
+            opacity: 1} ),
+        new THREE.MeshBasicMaterial( { 
+            map: new THREE.TextureLoader().load( 
+            'textures/TUMBLR.jpg' ), 
+            side: THREE.DoubleSide,
+            transparent: true,
+            opacity: 1} ),
+        new THREE.MeshBasicMaterial( { 
+            map: new THREE.TextureLoader().load( 
+            'textures/THESIS.jpg' ), 
+            side: THREE.DoubleSide,
+            transparent: true,
+            opacity: 1} ),
+        new THREE.MeshStandardMaterial( { 
+            color: 0x222222, 
+            side: THREE.DoubleSide,
+            transparent: true,
+            opacity: 0.5,
+            metalness: 0.0,
+            roughness: 0.5} )
+      ];
+    
+
+  var material = 
+      [
+          new THREE.MeshFaceMaterial( cubeMaterials[0] ),
+          new THREE.MeshFaceMaterial( cubeMaterials[1] ),
+          new THREE.MeshFaceMaterial( cubeMaterials[2] ),
+          new THREE.MeshFaceMaterial( cubeMaterials[3] ),
+          new THREE.MeshFaceMaterial( cubeMaterials[4] ),
+          new THREE.MeshFaceMaterial( cubeMaterials[5] ),
+          new THREE.MeshFaceMaterial( cubeMaterials[6] ),
+          new THREE.MeshFaceMaterial( cubeMaterials[7] ),
+      ];
+  
+  
+  var base = 
+      [
+          new THREE.Mesh(new THREE.BoxGeometry(0.1, 0, 0), 
+          new THREE.MeshPhongMaterial({color: 0x222222})),
+          
+          new THREE.Mesh(new THREE.BoxGeometry(0, 0, 0), 
+          new THREE.MeshPhongMaterial({color: 0x222222})),
+          
+          new THREE.Mesh(new THREE.BoxGeometry(0, 0, 0), 
+          new THREE.MeshPhongMaterial({color: 0x222222})),
+  
+          new THREE.Mesh(new THREE.BoxGeometry(0, 0, 0), 
+          new THREE.MeshPhongMaterial({color: 0x222222})),
+          
+          new THREE.Mesh(new THREE.BoxGeometry(0, 0, 0), 
+          new THREE.MeshPhongMaterial({color: 0x222222})),
+          
+          new THREE.Mesh(new THREE.BoxGeometry(0, 0, 0), 
+          new THREE.MeshPhongMaterial({color: 0x222222})),
+          
+          new THREE.Mesh(new THREE.BoxGeometry(0, 0, 0), 
+          new THREE.MeshPhongMaterial({color: 0x222222}))
+      ];
+    
+ 
+    
+  base[0].position.set(0, 0.05, -0.1);
+  base[1].position.set(0.2, 0, -0.1);
+  base[2].position.set(0.2, 0, -0.1);
+  base[3].position.set(0.2, 0, -0.1);
+  base[4].position.set(0.2, 0, -0.1);
+  base[5].position.set(0.2, 0, -0.1);
+  base[6].position.set(0.2, 0, -0.1);
+    
+    
+    
+  
+  function mainText(positionX) {
+    
+    let starText;
+
+    var loader = new THREE.FontLoader();
+
+    let star= loader.load("./fonts/helvetiker_regular.typeface.json", function(font) {
+      var geometry = new THREE.TextBufferGeometry("WEBSITE", {
+        font: font,
+        size: 0.23,
+        height: 0.04,
+        curveSegments: 12
+      });
+      geometry.translate(positionX, -0.27, -0.05);
+      starText = new THREE.Mesh(geometry, material[0]);
+      scene.add(starText);
+      
+        
+      console.log(positionX);
+    });
+    
+  };
+    
+    
+  mainText(-0.7);
+    
+
+  var planeMesh = new THREE.Mesh(planeGeo, material[3]);
+    
+
+  function slider() {
+    
+      
+  planeMesh.position.setX(0);
+  planeMesh.position.setY(0.05);
+  planeMesh.name = "planeMesh";
+    
+
+  planeMesh.position.set(
+      
+    0,
+    planeMesh.geometry.parameters.height / 2 - 0.03,
+    0.15
+      
+  );
+
+    
+  base[0].add(planeMesh);
+
+  scene.add(base[0]);
+    
+
+  };
+    
+  slider();  
+    
+    
+    
+  var plane = new InteractablePlane(planeMesh, Leap.loopController, 
+  {moveZ: false, moveX: true, moveY: false});
+    
+    
+  
+    
+  ///////////////////////////
+  ///////////////////////////
+  ///////////////////////////    
+
+    
+  var planeGeometry = new THREE.PlaneGeometry(0.25, 0.25);
+    
+    
+  var buttonMesh = 
+      [
+          new THREE.Mesh(planeGeometry, material[1]),
+          new THREE.Mesh(planeGeometry, material[2]),
+          new THREE.Mesh(planeGeometry, material[3]),
+          new THREE.Mesh(planeGeometry, material[4]),
+          new THREE.Mesh(planeGeometry, material[5]),
+          new THREE.Mesh(planeGeometry, material[6]),
+          new THREE.Mesh(planeGeometry, material[7])
+      ];
+
+  
+  ///////////////////////////
+  ///////////////////////////
+  /////////////////////////// 
+  
+
+  // Add a plane
+    
+  var squareButton = new PushButton(
+
+  new InteractablePlane(buttonMesh[0], Leap.loopController),
+
+    {
+      locking: false,
+      longThrow: longThrow[1]
+    }
+
+  ).on('press', function(mesh1){
+      
+     window.location.href = "about.html";
+      
+  });
+
+    
+
+  ///////////////////////////
+  ///////////////////////////
+  ///////////////////////////    
+    
+    
+  // Add a plane
+
+  var squareButton1 = new PushButton(
+
+  new InteractablePlane(buttonMesh[1], Leap.loopController),
+
+    {
+      locking: false,
+      longThrow: longThrow[2]
+    }
+
+  ).on('press', function(mesh2){
+      
+      window.location.href = "https://github.com/julian19136";
+
+  });
+
+    
+    
+  ///////////////////////////
+  ///////////////////////////
+  ///////////////////////////    
+    
+    
+  // Add a plane
+
+  var squareButton2 = new PushButton(
+
+  new InteractablePlane(buttonMesh[2], Leap.loopController),
+
+    {
+      locking: false,
+      longThrow: longThrow[3]
+    }
+
+  ).on('press', function(mesh3){
+      
+      
+
+  });
+
+    
+     
+  ///////////////////////////
+  ///////////////////////////
+  ///////////////////////////    
+    
+
+  // Add a plane
+
+  var squareButton3 = new PushButton(
+
+  new InteractablePlane(buttonMesh[3], Leap.loopController),
+
+    {
+      locking: false,
+      longThrow: longThrow[4]
+    }
+
+  ).on('press', function(mesh4){
+      
+      window.location.href = "artwork.html";
+
+  });
+
+
+    
+  ///////////////////////////
+  ///////////////////////////
+  ///////////////////////////    
+    
+
+  // Add a plane
+
+  var squareButton4 = new PushButton(
+
+  new InteractablePlane(buttonMesh[4], Leap.loopController),
+
+    {
+      locking: false,
+      longThrow: longThrow[5]
+    }
+
+  ).on('press', function(mesh5){
+      
+      window.location.href = "https://julian-dac-finalyear.tumblr.com";
+      
+  });
+
+
+    
+  ///////////////////////////
+  ///////////////////////////
+  ///////////////////////////    
+    
+
+  // Add a plane
+
+  var squareButton5 = new PushButton(
+
+  new InteractablePlane(buttonMesh[5], Leap.loopController),
+
+    {
+      locking: false,
+      longThrow: longThrow[6]
+    }
+
+  ).on('press', function(mesh6){
+      
+      window.location.href = "thesis.html";
+    
+  });
+
+ 
+    
+  ///////////////////////////
+  ///////////////////////////
+  ///////////////////////////
+     
+
+  // Add a plane
+
+  var squareButton6 = new PushButton(
+
+  new InteractablePlane(buttonMesh[6], Leap.loopController),
+
+    {
+      locking: false,
+      longThrow: longThrow[7]
+    }
+
+  ).on('press', function(mesh7){
+      
+      
+      
+  });
+
+    
+    
+  ///////////////////////////
+  ///////////////////////////
+  ///////////////////////////
+  
+ 
+    
+  plane.movementConstraints.x = function(x){
+    if (x > 0.45) return 0.45;
+    if (x < -0.45) return -0.45;
+      
+      
+    camera.position.set( 0, 0.2, 0.4);
+      
+ 
+      
+    buttonMesh[0].position.set(
+      (x * 4) - 0.8,
+      buttonMesh[0].geometry.parameters.height / 2 + 0.1,
+      0.025
+      );
+      
+      
+    buttonMesh[1].position.set(
+      (x * 4) + 0.3 - 0.8,
+      buttonMesh[1].geometry.parameters.height / 2 + 0.1,
+      0.025
+      );
+      
+      
+    buttonMesh[2].position.set(
+      (x * 4) + 0.3 - 0.8,
+      buttonMesh[2].geometry.parameters.height / 2 + 0.1,
+      0.025
+      );
+      
+      
+    buttonMesh[3].position.set(
+      (x * 4) + 0.6 - 0.8,
+      buttonMesh[3].geometry.parameters.height / 2 + 0.1,
+      0.025
+      );
+      
+      
+    buttonMesh[4].position.set(
+      (x * 4) + 0.9 - 0.8,
+      buttonMesh[4].geometry.parameters.height / 2 + 0.1,
+      0.025
+      );
+      
+      
+    buttonMesh[5].position.set(
+      (x * 4) + 1.2 - 0.8,
+      buttonMesh[5].geometry.parameters.height / 2 + 0.1,
+      0.025
+      );
+      
+      
+    buttonMesh[6].position.set(
+      (x * 4) + 5.5 - 0.8,
+      buttonMesh[6].geometry.parameters.height / 2 + 0.1,
+      0.025
+      );
+      
+      
+    return x;
+  };
+    
+    
+ 
+    
+    
+  squareButton.plane.resetPosition(); 
+  squareButton1.plane.resetPosition(); 
+  squareButton2.plane.resetPosition();
+  squareButton3.plane.resetPosition(); 
+  squareButton4.plane.resetPosition();
+  squareButton5.plane.resetPosition();
+
+
+  base[1].add(buttonMesh[0]);
+  base[2].add(buttonMesh[1]);
+  base[3].add(buttonMesh[3]);
+  base[4].add(buttonMesh[4]);
+  base[5].add(buttonMesh[5]);
+  base[6].add(buttonMesh[6]);
+  
+    
+  scene.add(base[1]);
+  scene.add(base[2]);
+  scene.add(base[3]);
+  scene.add(base[4]);
+  scene.add(base[5]);
+  scene.add(base[6]);
+    
+
+
+  
+</script>
+    
+
+
+</html>
