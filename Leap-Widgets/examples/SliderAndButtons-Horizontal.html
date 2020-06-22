@@ -1,0 +1,204 @@
+<html>
+    
+<head>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r69/three.js"></script>
+  <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r71/three.min.js"></script>
+  <script src="https://js.leapmotion.com/leap-0.6.4.js"></script>
+  <script src="js/leap-plugins-0.1.11pre.js"></script>
+
+  <script src="../build/leap-widgets-0.1.0.js"></script>
+  <script type="text/javascript" src="../build/leap.rigged-hand-0.1.7.js"></script>
+
+  <script src="js/OrbitControls.js"></script>
+
+  <style>
+    body {
+      margin: 0;
+    }
+      
+    canvas.leap-boneHAnd{
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+    }
+
+    #view-source {
+      position: absolute;
+      top: 0;
+      right: 0;
+      margin: 10px;
+      z-index: 10;
+    }
+         
+  </style>
+
+</head>
+    
+<body>
+
+ 
+</body>
+    
+
+<script>
+
+  // Set up plugins
+
+  Leap.loop({background: true})
+    .use('transform', {
+      vr: 'desktop' // Switch to meters.
+    })
+    .use('boneHand', {
+      targetEl: document.body,
+      jointColor: new THREE.Color(0xffffff),
+      rendererOps: {antialias: true}
+    })
+    .use('proximity');
+
+
+  (window.controller = new Leap.Controller)
+    .use('handHold', {})
+    .use('handEntry', {})
+    .use('riggedHand', {})
+  .connect()
+
+
+    
+  // Set up scene
+    
+  var scene = Leap.loopController.plugins.boneHand.scene;
+  var camera = Leap.loopController.plugins.boneHand.camera;
+  var renderer = Leap.loopController.plugins.boneHand.renderer;
+    
+  
+
+  //var controls = new THREE.OrbitControls( camera, renderer.domElement );
+
+  var planeGeo = new THREE.PlaneGeometry(0.1, 0.1);
+  var material = new THREE.MeshPhongMaterial({side: THREE.DoubleSide});
+  var planeMesh = new THREE.Mesh(planeGeo, material);
+  planeMesh.position.setX(0.05);
+  planeMesh.position.setY(0.05);
+  planeMesh.name = "planeMesh";
+    
+
+  longThrow = 0.00;
+  var base = new THREE.Mesh(new THREE.BoxGeometry(0.1, longThrow, longThrow), new THREE.MeshPhongMaterial({color: 0x222222}));
+  base.position.set(0, 0.05, -0.1);
+  //base.rotateY(Math.PI / 8);
+
+  planeMesh.position.set(
+    0,
+    planeMesh.geometry.parameters.height / 2 - longThrow - 0.03,
+    0.15
+  );
+  base.add(planeMesh);
+
+  scene.add(base);
+
+  var plane = new InteractablePlane(planeMesh, Leap.loopController, {moveZ: false, moveX: true, moveY: false});
+    
+  
+  ///////////////////////////
+  ///////////////////////////
+  ///////////////////////////    
+    
+
+  'use strict';
+      
+  //var controls = new THREE.OrbitControls( camera );
+
+  // Add a plane
+
+  var planeGeo = new THREE.PlaneGeometry(0.25, 0.25);
+  var material = new THREE.MeshPhongMaterial();
+  var buttonMesh = new THREE.Mesh(planeGeo, material);
+
+  buttonMesh.name = "rectangular button";
+
+//  buttonMesh.scale.setY(0.5);
+
+
+  var longThrow = -0.03;
+  var squareButton = new PushButton(
+
+  new InteractablePlane(buttonMesh, Leap.loopController),
+
+    {
+      locking: false,
+      longThrow: longThrow
+    }
+
+  ).on('press', function(mesh){
+
+    console.log('press');
+      
+    location.replace("https://www.w3schools.com")
+      
+    mesh.material.color.setHex(0xccccff);
+
+  }).on('release', function(mesh){
+
+    mesh.material.color.setHex(0xBEBEBE);
+
+  });
+    
+
+  squareButton.plane.hover(
+    function(mesh){ // over
+      console.log('hover in');
+      mesh.material.color.setHex(0xffccff);
+    },
+    function(mesh){ // out
+      console.log('hover out');
+      mesh.material.color.setHex(0xBEBEBE);
+    }
+  );
+    
+  
+
+  var base = new THREE.Mesh(new THREE.BoxGeometry(0, 0, 0), new THREE.MeshPhongMaterial({color: 0x222222}));
+  base.position.set(0.2, 0, -0.1);
+    
+
+    
+  plane.movementConstraints.x = function(x){
+    if (x > 0.15) return 0.15;
+    if (x < -0.15) return -0.15;
+      
+    camera.position.set( 0, 0.2, 0.5);
+    //camera.lookAt(0, 0, 0);
+      
+      
+      buttonMesh.position.set(
+      x * 4,
+      buttonMesh.geometry.parameters.height / 2 + 0.15,
+      0.01
+      );
+      
+      
+      
+      console.log();
+    
+      squareButton.plane.resetPosition(); // resets the original position, etc to the current one
+
+      base.add(buttonMesh);
+
+      scene.add(base);
+      
+      
+      
+    return x;
+  };
+
+  
+
+  
+</script>
+    
+
+
+</html>
