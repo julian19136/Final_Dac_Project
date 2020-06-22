@@ -1,0 +1,86 @@
+<html>
+<head>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r69/three.js"></script>
+  <script src="https://js.leapmotion.com/leap-0.6.4.js"></script>
+  <script src="js/leap-plugins-0.1.11pre.js"></script>
+
+  <script src="../build/leap-widgets-0.1.0.js"></script>
+
+  <script src="js/OrbitControls.js"></script>
+    
+  <script src="js/DecalGeometry.js"></script>
+  <style>
+    body {
+      margin: 0;
+    }
+  </style>
+
+</head>
+<body>
+    
+
+<p>
+</p>
+<ul>
+</ul>
+
+</body>
+
+<script>
+
+    
+    // Set up plugins
+
+    Leap.loop({background: true})
+    .use('transform', {
+      vr: 'desktop' // Switch to meters.
+    })
+    .use('boneHand', {
+      targetEl: document.body,
+      jointColor: new THREE.Color(0xffffff),
+      rendererOps: {antialias: true}
+    })
+    .use('proximity');
+    
+    
+    var scene = Leap.loopController.plugins.boneHand.scene;
+    var camera = Leap.loopController.plugins.boneHand.camera;
+    camera.position.set( 0, 0.3, 6);
+
+    var geometry = new THREE.PlaneGeometry(20, 20);
+    var material = new THREE.MeshBasicMaterial({color: 0x4a5f70, opacity: 0.8, transparent: true});
+    var face = new THREE.Mesh(geometry, material);
+    face.position.setX(0);
+    face.position.setY(0);
+    face.position.setZ(10);
+
+    var decalGeometry = new THREE.DecalGeometry(
+        face, 
+        new THREE.Vector3(0,0,10),
+        new THREE.Vector3(0,0,1), //z axis
+        new THREE.Vector3(20,20,20), 
+        new THREE.Vector3(0,0,0)
+    );
+
+    var decalMaterial = new THREE.MeshPhongMaterial({
+        color: 0xAAAAAA,
+        map: THREE.ImageUtils.loadTexture('textures/4.jpg'),
+        side: THREE.FrontSide,
+        opacity: 1.0,
+        transparent: true,
+        depthTest: true,
+        depthWrite: false,
+        polygonOffset: true,
+        polygonOffsetFactor: -4,
+    });
+
+    var mesh = new THREE.Mesh( decalGeometry, decalMaterial );
+
+    this.scene.add(face);
+    this.scene.add(mesh);
+    
+    
+</script>
+
+</html>
